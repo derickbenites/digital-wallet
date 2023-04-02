@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/req/create-user.dto';
-import { UpdateUserDto } from './dto/req/update-user.dto';
-import { UsersRepository } from './repositories/users.repository';
+import { CreateUserDto } from '../dto/req/create-user.dto';
+import { UpdateUserDto } from '../dto/req/update-user.dto';
+import { UsersRepository } from '../repositories/users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { UserDto } from './dto/res/user.dto';
+import { UserDto } from '../dto/res/user.dto';
 
 @Injectable()
 export class UsersService {
