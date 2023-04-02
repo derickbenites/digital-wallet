@@ -8,5 +8,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: 'pgpassword',
   database: 'picpay',
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  synchronize: true,
+  synchronize: false,
+  logging: false,
 };
