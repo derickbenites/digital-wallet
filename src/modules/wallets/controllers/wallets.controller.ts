@@ -8,10 +8,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { WalletsService } from '../services/wallets.service';
-import { CreateWalletDto } from '../dto/create-wallet.dto';
-import { UpdateWalletDto } from '../dto/update-wallet.dto';
+import { CreateWalletDto } from '../dto/req/create-wallet.dto';
+import { UpdateWalletDto } from '../dto/req/update-wallet.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('wallets')
+@ApiTags('Wallets')
+@ApiResponse({ status: 200 })
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 

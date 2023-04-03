@@ -9,5 +9,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   database: 'picpay',
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: false,
-  logging: false,
+  logging: true,
 };

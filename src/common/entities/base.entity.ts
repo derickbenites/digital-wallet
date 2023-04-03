@@ -13,6 +13,9 @@ export class BaseEntity {
   })
   public createdAt: Date;
 
+  @Column('varchar', { name: 'created_by', length: 36 })
+  createdBy: string;
+
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
@@ -22,18 +25,15 @@ export class BaseEntity {
   })
   public updatedAt: Date;
 
+  @Column('varchar', { name: 'updated_by', nullable: true, length: 36 })
+  updatedBy: string | null;
+
   @DeleteDateColumn({
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
   })
   public deletedAt: Date | null;
-
-  @Column('varchar', { name: 'created_by', length: 36 })
-  createdBy: string;
-
-  @Column('varchar', { name: 'updated_by', nullable: true, length: 36 })
-  updatedBy: string | null;
 
   @Column('varchar', { name: 'deleted_by', nullable: true, length: 36 })
   deletedBy: string | null;
