@@ -15,7 +15,7 @@ export class WalletEntity {
   @Column({ name: 'user_id', nullable: false, type: 'varchar', length: 200 })
   userId: string;
 
-  @Column({ nullable: false, type: 'int' })
+  @Column({ nullable: false, type: 'int', default: () => 0 })
   balance: number;
 
   @CreateDateColumn({

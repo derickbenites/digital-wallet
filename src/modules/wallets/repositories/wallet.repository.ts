@@ -38,4 +38,8 @@ export class WalletsRepository extends Repository<WalletEntity> {
       throw new InternalServerErrorException('Error saving wallet to database');
     }
   }
+
+  async updateWallet(wallet: WalletEntity) {
+    this.manager.save(WalletEntity, wallet);
+  }
 }

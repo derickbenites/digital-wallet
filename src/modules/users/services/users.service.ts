@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/req/create-user.dto';
 import { UpdateUserDto } from '../dto/req/update-user.dto';
 import { UsersRepository } from '../repositories/users.repository';
@@ -61,5 +61,19 @@ export class UsersService {
 
   remove(id: string) {
     return this.usersRepository.removeUser(id);
+  }
+
+  async valideUser(userId: string) {
+    const user = this.usersRepository.findOneOrFail({ where: { id: userId } });
+    if (!user) {
+      throw new HttpException(
+        {
+          message: 'User does not found',
+          status: false,
+          status_code: 4000,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
