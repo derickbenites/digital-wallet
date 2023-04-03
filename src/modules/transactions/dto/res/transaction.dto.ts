@@ -9,14 +9,11 @@ export class TransactionDto {
   userId: string;
 
   @ApiProperty({ required: true })
-  valueTransaction: string;
+  valueTransaction: number;
 
   @ApiProperty({ required: true })
   action: number;
 
   @ApiProperty({ required: true })
   walletId: string;
-
-  @ApiProperty({ required: true })
-  dateTransaction: Date;
 }

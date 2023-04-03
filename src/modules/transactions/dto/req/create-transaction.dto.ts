@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -18,21 +18,17 @@ export class CreateTransactionDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ required: true })
-  valueTransaction: string;
+  walletId: string;
 
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({ required: true })
-  action: number;
+  valueTransaction: number;
 
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   @ApiProperty({ required: true })
-  walletId: string;
-
-  @IsDateString()
-  @ApiProperty({ required: true })
-  dateTransaction: Date;
+  action: TypeTransaction;
 }
 
 export class ReqCreateTransactionDto {

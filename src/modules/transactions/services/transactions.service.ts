@@ -1,11 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
-import { UpdateTransactionDto } from '../dto/req/update-transaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TransactionRepository } from '../repositories/transaction.repository';
+import { TransactionDto } from '../dto/res/transaction.dto';
+import { WalletsService } from 'src/modules/wallets/services/wallets.service';
+import { UsersService } from 'src/modules/users/services/users.service';
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionDto: CreateTransactionDto) {
-    console.log(createTransactionDto);
+  constructor(
+    @InjectRepository(TransactionRepository)
+    private readonly transactionRepository: TransactionRepository,
+    private readonly usersService: UsersService,
+    private readonly walletService: WalletsService,
+  ) {}
+
+  async create(createTransactionDto: CreateTransactionDto) {
+    this.valideTransaction(createTransactionDto);
+    this.walletService.updateBalance(createTransactionDto);
+
+    const transaction = await this.transactionRepository.createTransaction(
+      createTransactionDto,
+    );
+
+    return new TransactionDto(transaction);
+  }
+
+  async valideTransaction(dto: CreateTransactionDto) {
+    this.usersService.valideUser(dto.userId);
+    this.walletService.valideWallet(dto.walletId);
   }
 
   findAll() {
@@ -14,10 +37,6 @@ export class TransactionsService {
 
   findOne(id: number) {
     return `This action returns a #${id} transaction`;
-  }
-
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
   }
 
   remove(id: number) {
