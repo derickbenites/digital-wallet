@@ -1,7 +1,25 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Query,
+} from '@nestjs/common';
 import { ShoppingService } from '../services/shopping.service';
 import { CreateShoppingDto } from '../dto/req/create-shopping.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ShoppingDto } from '../dto/res/shopping.dto';
+import { ShoppingPaginateDto } from '../dto/res/shopping-paginate.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 
 @Controller('shopping')
 @ApiTags('Shopping')
@@ -9,14 +27,20 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 export class ShoppingController {
   constructor(private readonly shoppingService: ShoppingService) {}
 
+  @ApiOperation({ operationId: 'createShopping' })
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: ShoppingDto })
   create(@Body() createShoppingDto: CreateShoppingDto) {
     return this.shoppingService.create(createShoppingDto);
   }
 
+  @ApiOperation({ operationId: 'allShopping' })
   @Get()
-  findAll() {
-    return this.shoppingService.findAll();
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: ShoppingPaginateDto })
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.shoppingService.findAll(pageOptionsDto);
   }
 
   @Get(':id')
