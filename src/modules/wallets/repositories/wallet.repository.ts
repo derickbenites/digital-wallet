@@ -1,12 +1,9 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { WalletEntity } from '../entities/wallet.entity';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { paginateRaw } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class WalletsRepository extends Repository<WalletEntity> {
@@ -14,13 +11,13 @@ export class WalletsRepository extends Repository<WalletEntity> {
     super(WalletEntity, dataSource.createEntityManager());
   }
 
-  // async findAllUsers(pageOptionsDto: PageOptionsDto) {
-  //   const queryBuilder = this.dataSource
-  //     .createQueryBuilder()
-  //     .from(UserEntity, 'users')
-  //     .select();
-  //   return await paginateRaw(queryBuilder, pageOptionsDto);
-  // }
+  async findAllWallets(pageOptionsDto: PageOptionsDto) {
+    const queryBuilder = this.dataSource
+      .createQueryBuilder()
+      .from(WalletEntity, 'wallets')
+      .select();
+    return await paginateRaw(queryBuilder, pageOptionsDto);
+  }
 
   async createWallet(createWalletDto: CreateWalletDto): Promise<WalletEntity> {
     if (
@@ -41,39 +38,4 @@ export class WalletsRepository extends Repository<WalletEntity> {
       throw new InternalServerErrorException('Error saving wallet to database');
     }
   }
-
-  // async removeWallet(id: string) {
-  //   const user = await this.dataSource.manager.findOneBy(UserEntity, {
-  //     id: id,
-  //   });
-
-  //   if (!user) {
-  //     throw new HttpException(
-  //       {
-  //         message: 'User does not found',
-  //         status: false,
-  //         status_code: 4000,
-  //       },
-  //       HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  //   await this.dataSource.manager
-  //     .createQueryBuilder()
-  //     .update(UserEntity)
-  //     .set({
-  //       updatedBy: user.id,
-  //       deletedAt: new Date(),
-  //       deletedBy: user.id,
-  //       status: false,
-  //     })
-  //     .where('id = :id', { id: id })
-  //     .execute()
-  //     .then((data) => {
-  //       return {
-  //         message: 'User deleted succefuly',
-  //         status: true,
-  //         status_code: 2000,
-  //       };
-  //     });
-  // }
 }

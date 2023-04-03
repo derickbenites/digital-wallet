@@ -4,21 +4,27 @@ import { UpdateWalletDto } from '../dto/req/update-wallet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WalletsRepository } from '../repositories/wallet.repository';
 import { WalletDto } from '../dto/res/wallet.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 
 @Injectable()
 export class WalletsService {
   constructor(
     @InjectRepository(WalletsRepository)
-    private readonly usersRepository: WalletsRepository,
+    private readonly walletsRepository: WalletsRepository,
   ) {}
 
   async create(createWalletDto: CreateWalletDto) {
-    const wallet = await this.usersRepository.createWallet(createWalletDto);
+    const wallet = await this.walletsRepository.createWallet(createWalletDto);
     return new WalletDto(wallet);
   }
 
-  findAll() {
-    return `This action returns all wallets`;
+  async findAll(pageOptionsDto: PageOptionsDto) {
+    const wallets = await this.walletsRepository.findAllWallets(pageOptionsDto);
+
+    return {
+      ...wallets,
+      items: wallets.items.map((item) => new WalletDto(item)),
+    };
   }
 
   findOne(id: number) {

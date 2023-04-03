@@ -6,11 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { WalletsService } from '../services/wallets.service';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { UpdateWalletDto } from '../dto/req/update-wallet.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { WalletDto } from '../dto/res/wallet.dto';
+import { WalletPaginateDto } from '../dto/res/wallet-paginate.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 
 @Controller('wallets')
 @ApiTags('Wallets')
@@ -18,14 +29,20 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 
+  @ApiOperation({ operationId: 'createWallet' })
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: WalletDto })
   create(@Body() createWalletDto: CreateWalletDto) {
     return this.walletsService.create(createWalletDto);
   }
 
+  @ApiOperation({ operationId: 'allWallets' })
   @Get()
-  findAll() {
-    return this.walletsService.findAll();
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: WalletPaginateDto })
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.walletsService.findAll(pageOptionsDto);
   }
 
   @Get(':id')
