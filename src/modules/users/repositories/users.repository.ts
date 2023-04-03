@@ -41,11 +41,9 @@ export class UsersRepository extends Repository<UserEntity> {
       return await this.manager.save(UserEntity, user);
     } catch (error) {
       if (error.code.toString() === '23505') {
-        throw new ConflictException('Endereço de email já está em uso');
+        throw new ConflictException('Email is already in use');
       } else {
-        throw new InternalServerErrorException(
-          'Erro ao salvar o usuário no banco de dados',
-        );
+        throw new InternalServerErrorException('Error saving user to database');
       }
     }
   }

@@ -8,7 +8,7 @@
 	deleted_at timestamp NULL,
 	CONSTRAINT "PK_id_wallet" PRIMARY KEY (id)
 );
-ALTER TABLE public.wallets ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id);`
+ALTER TABLE wallets ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id);`
 
 --down
-`DROP TABLE "wallets";`
+`DROP TABLE wallets;`

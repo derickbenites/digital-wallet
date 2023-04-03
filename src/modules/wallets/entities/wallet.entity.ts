@@ -12,7 +12,7 @@ export class WalletEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false, type: 'varchar', length: 200 })
+  @Column({ name: 'user_id', nullable: false, type: 'varchar', length: 200 })
   userId: string;
 
   @Column({ nullable: false, type: 'int' })
