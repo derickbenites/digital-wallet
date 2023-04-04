@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 import { CreateShoppingDto } from '../dto/req/create-shopping.dto';
@@ -21,11 +21,11 @@ export class ShoppingRepository extends Repository<ShoppingEntity> {
 
   async createShopping(
     createShoppingDto: CreateShoppingDto,
+    entityManager: EntityManager,
   ): Promise<ShoppingEntity> {
-    const shopping = this.manager.create(ShoppingEntity, createShoppingDto);
-
     try {
-      return await this.manager.save(ShoppingEntity, shopping);
+      const shopping = entityManager.create(ShoppingEntity, createShoppingDto);
+      return await entityManager.save(ShoppingEntity, shopping);
     } catch (error) {
       throw new InternalServerErrorException(
         'Error saving shopping to database',

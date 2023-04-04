@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRepository } from '../repositories/transaction.repository';
@@ -8,6 +8,7 @@ import { UsersService } from 'src/modules/users/services/users.service';
 import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class TransactionsService {
@@ -20,20 +21,48 @@ export class TransactionsService {
 
   async create(createTransactionDto: CreateTransactionDto) {
     this.valideTransaction(createTransactionDto);
-    this.walletService.updateBalance(createTransactionDto);
-    const transaction = await this.saveTransaction(createTransactionDto);
+    try {
+      await this.transactionRepository.manager.transaction(
+        async (entityManager) => {
+          this.walletService.updateBalance(createTransactionDto, entityManager);
+          const transaction = await this.saveTransaction(
+            createTransactionDto,
+            entityManager,
+          );
 
-    return new TransactionDto(transaction);
+          return new TransactionDto(transaction);
+        },
+      );
+    } catch (error) {
+      console.error(
+        JSON.stringify({ context: this.create.name, message: error }),
+      );
+
+      throw new HttpException(
+        {
+          message: error.message,
+          status: false,
+          status_code: error.status_code || 4000,
+        },
+        error.status,
+      );
+    }
   }
 
-  async saveTransaction(transaction: CreateTransactionDto) {
+  async saveTransaction(
+    transaction: CreateTransactionDto,
+    entityManager: EntityManager,
+  ) {
     if (
       transaction.action === TypeTransaction.PAYMENT ||
       transaction.action === TypeTransaction.WITHDRAW
     ) {
       transaction.valueTransaction = -transaction.valueTransaction;
     }
-    return await this.transactionRepository.createTransaction(transaction);
+    return await this.transactionRepository.createTransaction(
+      transaction,
+      entityManager,
+    );
   }
 
   async valideTransaction(dto: CreateTransactionDto) {

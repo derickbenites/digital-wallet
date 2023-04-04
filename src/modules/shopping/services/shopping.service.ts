@@ -20,25 +20,45 @@ export class ShoppingService {
   async create(createShoppingDto: CreateShoppingDto) {
     const { userId, walletId, price } = createShoppingDto;
 
-    const wallet = await this.walletService.findOne(walletId, userId);
+    try {
+      const wallet = await this.walletService.findOne(walletId, userId);
 
-    this.validateShopping(wallet.balance, price);
+      this.validateShopping(wallet.balance, price);
 
-    const shopping = await this.shoppingRepository.createShopping(
-      createShoppingDto,
-    );
+      await this.shoppingRepository.manager.transaction(
+        async (entityManager) => {
+          const shopping = await this.shoppingRepository.createShopping(
+            createShoppingDto,
+            entityManager,
+          );
 
-    const transaction = {
-      userId,
-      walletId,
-      valueTransaction: price,
-      action: TypeTransaction.PAYMENT,
-    };
+          const transaction = {
+            userId,
+            walletId,
+            valueTransaction: price,
+            action: TypeTransaction.PAYMENT,
+          };
 
-    this.walletService.updateBalance(transaction);
-    this.transactionService.saveTransaction(transaction);
+          this.walletService.updateBalance(transaction, entityManager);
+          this.transactionService.saveTransaction(transaction, entityManager);
 
-    return new ShoppingDto(shopping);
+          return new ShoppingDto(shopping);
+        },
+      );
+    } catch (error) {
+      console.error(
+        JSON.stringify({ context: this.create.name, message: error }),
+      );
+
+      throw new HttpException(
+        {
+          message: error.message,
+          status: false,
+          status_code: error.status_code || 4000,
+        },
+        error.status,
+      );
+    }
   }
 
   async findAll(pageOptionsDto: PageOptionsDto) {
@@ -58,20 +78,41 @@ export class ShoppingService {
   }
 
   async remove(id: string) {
-    const shopping = await this.shoppingRepository.findOneOrFail({
-      where: { id },
-    });
+    try {
+      await this.shoppingRepository.manager.transaction(
+        async (entityManager) => {
+          const shopping = await this.shoppingRepository.findOneOrFail({
+            where: { id },
+          });
+          const { userId, walletId, price } = shopping;
 
-    const { userId, walletId, price } = shopping;
+          await this.shoppingRepository.softDelete(id);
 
-    await this.shoppingRepository.softDelete(id);
+          this.transactionService.saveTransaction(
+            {
+              userId,
+              walletId,
+              valueTransaction: price,
+              action: TypeTransaction.REVERSAL,
+            },
+            entityManager,
+          );
+        },
+      );
+    } catch (error) {
+      console.error(
+        JSON.stringify({ context: this.create.name, message: error }),
+      );
 
-    this.transactionService.saveTransaction({
-      userId,
-      walletId,
-      valueTransaction: price,
-      action: TypeTransaction.REVERSAL,
-    });
+      throw new HttpException(
+        {
+          message: error.message,
+          status: false,
+          status_code: error.status_code || 4000,
+        },
+        error.status,
+      );
+    }
   }
 
   async validateShopping(balance: number, price: number) {

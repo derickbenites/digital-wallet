@@ -6,6 +6,7 @@ import { WalletDto } from '../dto/res/wallet.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { CreateTransactionDto } from 'src/modules/transactions/dto/req/create-transaction.dto';
 import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class WalletsService {
@@ -46,39 +47,67 @@ export class WalletsService {
     return new WalletDto(wallet);
   }
 
-  async updateBalance(createTransactionDto: CreateTransactionDto) {
-    const wallet = await this.walletsRepository.findOneOrFail({
-      where: {
-        userId: createTransactionDto.userId,
-        id: createTransactionDto.walletId,
-      },
-    });
+  async updateBalance(
+    createTransactionDto: CreateTransactionDto,
+    entityManager: EntityManager,
+  ) {
+    try {
+      const wallet = await this.walletsRepository.findOneOrFail({
+        where: {
+          userId: createTransactionDto.userId,
+          id: createTransactionDto.walletId,
+        },
+      });
 
-    if (
-      createTransactionDto.action === TypeTransaction.DEPOSIT ||
-      createTransactionDto.action === TypeTransaction.REVERSAL
-    ) {
-      wallet.balance = wallet.balance + createTransactionDto.valueTransaction;
-    }
-
-    if (
-      createTransactionDto.action === TypeTransaction.PAYMENT ||
-      createTransactionDto.action === TypeTransaction.WITHDRAW
-    ) {
-      if (wallet.balance < createTransactionDto.valueTransaction) {
-        throw new HttpException(
-          {
-            message: 'Insufficient balance to carry out transaction',
-            status: false,
-            status_code: 4000,
-          },
-          HttpStatus.BAD_REQUEST,
-        );
+      if (
+        createTransactionDto.action === TypeTransaction.DEPOSIT ||
+        createTransactionDto.action === TypeTransaction.REVERSAL
+      ) {
+        wallet.balance = wallet.balance + createTransactionDto.valueTransaction;
       }
-      wallet.balance = wallet.balance - createTransactionDto.valueTransaction;
+
+      if (
+        createTransactionDto.action === TypeTransaction.PAYMENT ||
+        createTransactionDto.action === TypeTransaction.WITHDRAW
+      ) {
+        if (wallet.balance < createTransactionDto.valueTransaction) {
+          throw new HttpException(
+            {
+              message: 'Insufficient balance to carry out transaction',
+              status: false,
+              status_code: 4000,
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        wallet.balance = wallet.balance - createTransactionDto.valueTransaction;
+      }
+      wallet.updatedAt = new Date();
+
+      await this.walletsRepository.manager
+        .transaction(async (entityManager) => {
+          return await this.walletsRepository.updateWallet(
+            wallet,
+            entityManager,
+          );
+        })
+        .catch((error) => {
+          throw new HttpException(error.message, error.status);
+        });
+    } catch (error) {
+      console.error(
+        JSON.stringify({ context: this.updateBalance.name, message: error }),
+      );
+
+      throw new HttpException(
+        {
+          message: error.message,
+          status: false,
+          status_code: error.status_code || 4000,
+        },
+        error.status,
+      );
     }
-    wallet.updatedAt = new Date();
-    this.walletsRepository.updateWallet(wallet);
   }
 
   async valideWallet(walletId: string) {
