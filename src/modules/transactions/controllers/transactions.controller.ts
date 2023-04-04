@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { TransactionsService } from '../services/transactions.service';
-import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
+import { CreateTransactionDto, ReqCreateTransactionDto } from '../dto/req/create-transaction.dto';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -30,7 +30,7 @@ export class TransactionsController {
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
   @ApiOkResponse({ type: TransactionDto })
-  create(@Body() createTransactionDto: CreateTransactionDto) {
+  create(@Body() createTransactionDto: Array<CreateTransactionDto>) {
     return this.transactionsService.create(createTransactionDto);
   }
 

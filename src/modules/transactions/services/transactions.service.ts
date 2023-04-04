@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
+import { CreateTransactionDto, ReqCreateTransactionDto } from '../dto/req/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRepository } from '../repositories/transaction.repository';
 import { TransactionDto } from '../dto/res/transaction.dto';
@@ -9,7 +9,6 @@ import { TypeTransaction } from 'src/common/constants/type-transaction.constant'
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { EntityManager } from 'typeorm';
-import { TransactionEntity } from '../entities/transaction.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -20,17 +19,15 @@ export class TransactionsService {
     private readonly walletService: WalletsService,
   ) {}
 
-  async create(createTransactionDto: CreateTransactionDto) {
-    this.valideTransaction(createTransactionDto);
+  async create(createTransactionDto: Array<CreateTransactionDto>) {
     try {
       await this.transactionRepository.manager.transaction(
         async (entityManager) => {
-          this.walletService.updateBalance(createTransactionDto, entityManager);
-          const transaction = await this.saveTransaction(
-            createTransactionDto,
-            entityManager,
-          );
-          return new TransactionDto(transaction);
+          createTransactionDto.forEach((transaction) => {
+            this.valideTransaction(transaction);
+            this.walletService.updateBalance(transaction, entityManager);
+            this.saveTransaction(transaction, entityManager);
+          });
         },
       );
     } catch (error) {

@@ -32,7 +32,7 @@ export class CreateTransactionDto {
 }
 
 export class ReqCreateTransactionDto {
-  @Type(() => CreateTransactionDto)
+  @Type(() => Array<CreateTransactionDto>)
   @ValidateNested({ each: true })
   @IsArray()
   @IsNotEmpty()
