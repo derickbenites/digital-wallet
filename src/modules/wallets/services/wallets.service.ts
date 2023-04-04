@@ -84,16 +84,7 @@ export class WalletsService {
       }
       wallet.updatedAt = new Date();
 
-      await this.walletsRepository.manager
-        .transaction(async (entityManager) => {
-          return await this.walletsRepository.updateWallet(
-            wallet,
-            entityManager,
-          );
-        })
-        .catch((error) => {
-          throw new HttpException(error.message, error.status);
-        });
+      return await this.walletsRepository.updateWallet(wallet, entityManager);
     } catch (error) {
       console.error(
         JSON.stringify({ context: this.updateBalance.name, message: error }),

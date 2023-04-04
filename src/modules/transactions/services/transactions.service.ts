@@ -9,6 +9,7 @@ import { TypeTransaction } from 'src/common/constants/type-transaction.constant'
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { EntityManager } from 'typeorm';
+import { TransactionEntity } from '../entities/transaction.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -29,7 +30,6 @@ export class TransactionsService {
             createTransactionDto,
             entityManager,
           );
-
           return new TransactionDto(transaction);
         },
       );
