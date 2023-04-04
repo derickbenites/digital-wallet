@@ -46,7 +46,7 @@ export class WalletsService {
 
     if (
       createTransactionDto.action === TypeTransaction.DEPOSIT ||
-      TypeTransaction.REVERSAL
+      createTransactionDto.action === TypeTransaction.REVERSAL
     ) {
       wallet.balance = wallet.balance + createTransactionDto.valueTransaction;
     }

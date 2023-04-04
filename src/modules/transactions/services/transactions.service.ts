@@ -5,6 +5,7 @@ import { TransactionRepository } from '../repositories/transaction.repository';
 import { TransactionDto } from '../dto/res/transaction.dto';
 import { WalletsService } from 'src/modules/wallets/services/wallets.service';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
 
 @Injectable()
 export class TransactionsService {
@@ -18,6 +19,14 @@ export class TransactionsService {
   async create(createTransactionDto: CreateTransactionDto) {
     this.valideTransaction(createTransactionDto);
     this.walletService.updateBalance(createTransactionDto);
+
+    if (
+      createTransactionDto.action === TypeTransaction.PAYMENT ||
+      createTransactionDto.action === TypeTransaction.WITHDRAW
+    ) {
+      createTransactionDto.valueTransaction =
+        -createTransactionDto.valueTransaction;
+    }
 
     const transaction = await this.transactionRepository.createTransaction(
       createTransactionDto,
