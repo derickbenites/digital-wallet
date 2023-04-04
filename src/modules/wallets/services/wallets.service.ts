@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WalletsRepository } from '../repositories/wallet.repository';

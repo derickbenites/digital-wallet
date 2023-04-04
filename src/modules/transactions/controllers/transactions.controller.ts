@@ -4,9 +4,9 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Query,
 } from '@nestjs/common';
 import { TransactionsService } from '../services/transactions.service';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
@@ -17,6 +17,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TransactionDto } from '../dto/res/transaction.dto';
+import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 
 @Controller('transactions')
 @ApiTags('Transactions')
@@ -32,18 +34,20 @@ export class TransactionsController {
     return this.transactionsService.create(createTransactionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  @ApiOperation({ operationId: 'getWalletExtract' })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: TransactionDto })
+  @Get(':userId')
+  findAll(
+    @Param('userId') userId: string,
+    @Query() params: TrasactionParamsDto,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ) {
+    return this.transactionsService.findAll(userId, params, pageOptionsDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
   }
 }
