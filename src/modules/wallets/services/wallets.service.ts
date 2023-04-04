@@ -43,8 +43,12 @@ export class WalletsService {
     return wallet;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+  async getBalance(userId: string) {
+    const wallet = await this.walletsRepository.findOneOrFail({
+      where: { userId },
+    });
+
+    return new WalletDto(wallet);
   }
 
   async updateBalance(createTransactionDto: CreateTransactionDto) {

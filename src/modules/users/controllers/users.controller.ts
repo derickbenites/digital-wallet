@@ -45,11 +45,6 @@ export class UsersController {
     return await this.usersService.findAll(pageOptionsDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
   @ApiOperation({ operationId: 'updateUser' })
   @Patch(':id')
   @ApiOkResponse({ type: UserDto })

@@ -43,8 +43,11 @@ export class WalletsController {
     return this.walletsService.findAll(pageOptionsDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.walletsService.remove(+id);
+  @ApiOperation({ operationId: 'getOneWallet' })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOkResponse({ type: WalletPaginateDto })
+  @Get(':userId')
+  findOne(@Param('userId') userId: string) {
+    return this.walletsService.getBalance(userId);
   }
 }
