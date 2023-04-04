@@ -57,8 +57,21 @@ export class ShoppingService {
     return `This action returns a #${id} shopping`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} shopping`;
+  async remove(id: string) {
+    const shopping = await this.shoppingRepository.findOneOrFail({
+      where: { id },
+    });
+
+    const { userId, walletId, price } = shopping;
+
+    await this.shoppingRepository.softDelete(id);
+
+    this.transactionService.saveTransaction({
+      userId,
+      walletId,
+      valueTransaction: price,
+      action: TypeTransaction.REVERSAL,
+    });
   }
 
   async validateShopping(balance: number, price: number) {
