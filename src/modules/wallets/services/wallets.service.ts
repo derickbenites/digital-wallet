@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WalletsRepository } from '../repositories/wallet.repository';
@@ -28,8 +33,14 @@ export class WalletsService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
+  async findOne(id: string, userId: string) {
+    const wallet = await this.walletsRepository.findOneOrFail({
+      where: {
+        userId,
+        id,
+      },
+    });
+    return wallet;
   }
 
   remove(id: number) {
@@ -67,7 +78,6 @@ export class WalletsService {
       }
       wallet.balance = wallet.balance - createTransactionDto.valueTransaction;
     }
-
     wallet.updatedAt = new Date();
     this.walletsRepository.updateWallet(wallet);
   }

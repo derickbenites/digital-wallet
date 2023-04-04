@@ -19,20 +19,19 @@ export class TransactionsService {
   async create(createTransactionDto: CreateTransactionDto) {
     this.valideTransaction(createTransactionDto);
     this.walletService.updateBalance(createTransactionDto);
-
-    if (
-      createTransactionDto.action === TypeTransaction.PAYMENT ||
-      createTransactionDto.action === TypeTransaction.WITHDRAW
-    ) {
-      createTransactionDto.valueTransaction =
-        -createTransactionDto.valueTransaction;
-    }
-
-    const transaction = await this.transactionRepository.createTransaction(
-      createTransactionDto,
-    );
+    const transaction = await this.saveTransaction(createTransactionDto);
 
     return new TransactionDto(transaction);
+  }
+
+  async saveTransaction(transaction: CreateTransactionDto) {
+    if (
+      transaction.action === TypeTransaction.PAYMENT ||
+      transaction.action === TypeTransaction.WITHDRAW
+    ) {
+      transaction.valueTransaction = -transaction.valueTransaction;
+    }
+    return await this.transactionRepository.createTransaction(transaction);
   }
 
   async valideTransaction(dto: CreateTransactionDto) {

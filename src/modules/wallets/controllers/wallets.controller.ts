@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ClassSerializerInterceptor,
@@ -12,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { WalletsService } from '../services/wallets.service';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
-import { UpdateWalletDto } from '../dto/req/update-wallet.dto';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -43,11 +41,6 @@ export class WalletsController {
   @ApiOkResponse({ type: WalletPaginateDto })
   async findAll(@Query() pageOptionsDto: PageOptionsDto) {
     return this.walletsService.findAll(pageOptionsDto);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.walletsService.findOne(+id);
   }
 
   @Delete(':id')
