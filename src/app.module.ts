@@ -5,7 +5,6 @@ import { UsersModule } from './modules/users/users.module';
 import { WalletsModule } from './modules/wallets/wallets.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ShoppingModule } from './modules/shopping/shopping.module';
-import { PaymentReversalModule } from './modules/payment-reversal/payment-reversal.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { PaymentReversalModule } from './modules/payment-reversal/payment-revers
     WalletsModule,
     TransactionsModule,
     ShoppingModule,
-    PaymentReversalModule,
   ],
   controllers: [],
   providers: [],
