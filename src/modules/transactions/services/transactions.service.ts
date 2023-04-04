@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRepository } from '../repositories/transaction.repository';
@@ -6,6 +6,8 @@ import { TransactionDto } from '../dto/res/transaction.dto';
 import { WalletsService } from 'src/modules/wallets/services/wallets.service';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -39,15 +41,25 @@ export class TransactionsService {
     this.walletService.valideWallet(dto.walletId);
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  async findAll(
+    userId: string,
+    params: TrasactionParamsDto,
+    pageOptionsDto: PageOptionsDto,
+  ) {
+    this.usersService.valideUser(userId);
+    const transaction = await this.transactionRepository.getWalletExtract(
+      userId,
+      params.type,
+      pageOptionsDto,
+    );
+
+    return {
+      ...transaction,
+      items: transaction.items.map((item) => new TransactionDto(item)),
+    };
   }
 
   findOne(id: number) {
     return `This action returns a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
   }
 }

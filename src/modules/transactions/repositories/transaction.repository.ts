@@ -4,6 +4,7 @@ import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 import { TransactionEntity } from '../entities/transaction.entity';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
+import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
 
 @Injectable()
 export class TransactionRepository extends Repository<TransactionEntity> {
@@ -39,5 +40,22 @@ export class TransactionRepository extends Repository<TransactionEntity> {
         'Error saving transaction to database',
       );
     }
+  }
+
+  async getWalletExtract(
+    userId: string,
+    type: TypeTransaction,
+    pageOptionsDto: PageOptionsDto,
+  ) {
+    const queryBuilder = this.dataSource
+      .createQueryBuilder()
+      .from(TransactionEntity, 'transactions')
+      .select()
+      .where('user_id = :userId', { userId });
+
+    if (type) {
+      queryBuilder.andWhere('action = :type', { type });
+    }
+    return await paginateRaw(queryBuilder, pageOptionsDto);
   }
 }

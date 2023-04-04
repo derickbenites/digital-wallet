@@ -60,7 +60,9 @@ export class UsersService {
   }
 
   async valideUser(userId: string) {
-    const user = this.usersRepository.findOneOrFail({ where: { id: userId } });
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
     if (!user) {
       throw new HttpException(
         {
