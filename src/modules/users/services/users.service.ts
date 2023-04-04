@@ -44,10 +44,6 @@ export class UsersService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
   async update(id: string, updateUserDto: UpdateUserDto) {
     const userUpdated = await this.usersRepository.updateUser(
       updateUserDto,
