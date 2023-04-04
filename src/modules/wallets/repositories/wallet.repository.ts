@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { WalletEntity } from '../entities/wallet.entity';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
@@ -39,7 +39,9 @@ export class WalletsRepository extends Repository<WalletEntity> {
     }
   }
 
-  async updateWallet(wallet: WalletEntity) {
-    this.manager.save(WalletEntity, wallet);
+  async updateWallet(wallet: WalletEntity, entityManager: EntityManager) {
+    const queryBuilder = entityManager.createQueryBuilder();
+
+    return await queryBuilder.update(WalletEntity, wallet);
   }
 }

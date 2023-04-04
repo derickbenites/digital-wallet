@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 import { TransactionEntity } from '../entities/transaction.entity';
@@ -22,19 +22,20 @@ export class TransactionRepository extends Repository<TransactionEntity> {
 
   async createTransaction(
     createTransactionDto: CreateTransactionDto,
+    entityManager: EntityManager
   ): Promise<TransactionEntity> {
     const transactionEntity = {
       ...createTransactionDto,
       createdBy: createTransactionDto.userId,
     };
 
-    const transaction = this.manager.create(
+    const transaction = entityManager.create(
       TransactionEntity,
       transactionEntity,
     );
 
     try {
-      return await this.manager.save(TransactionEntity, transaction);
+      return await entityManager.save(TransactionEntity, transaction);
     } catch (error) {
       throw new InternalServerErrorException(
         'Error saving transaction to database',
