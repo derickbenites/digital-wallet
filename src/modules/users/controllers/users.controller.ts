@@ -54,6 +54,7 @@ export class UsersController {
 
   @ApiOperation({ operationId: 'deleteUser' })
   @Delete(':id')
+  @ApiOkResponse({ type: UserDto })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }

@@ -43,11 +43,6 @@ export class ShoppingController {
     return this.shoppingService.findAll(pageOptionsDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shoppingService.findOne(+id);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.shoppingService.remove(id);

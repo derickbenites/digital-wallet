@@ -73,10 +73,6 @@ export class ShoppingService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shopping`;
-  }
-
   async remove(id: string) {
     try {
       await this.shoppingRepository.manager.transaction(

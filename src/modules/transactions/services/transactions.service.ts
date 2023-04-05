@@ -84,8 +84,4 @@ export class TransactionsService {
       items: transaction.items.map((item) => new TransactionDto(item)),
     };
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
 }
