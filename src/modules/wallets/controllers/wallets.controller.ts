@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   ClassSerializerInterceptor,
   UseInterceptors,
   Query,
@@ -19,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { WalletDto } from '../dto/res/wallet.dto';
 import { WalletPaginateDto } from '../dto/res/wallet-paginate.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 
 @Controller('wallets')
 @ApiTags('Wallets')

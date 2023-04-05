@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 import { CreateShoppingDto } from '../dto/req/create-shopping.dto';
 import { ShoppingEntity } from '../entities/shopping.entity';

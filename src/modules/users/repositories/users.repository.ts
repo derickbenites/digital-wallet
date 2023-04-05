@@ -10,7 +10,7 @@ import { UserEntity } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/req/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { UpdateUserDto } from '../dto/req/update-user.dto';
 
 @Injectable()

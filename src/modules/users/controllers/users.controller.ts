@@ -19,7 +19,7 @@ import {
   ApiResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { UserDto } from '../dto/res/user.dto';
 import { UserPaginateDto } from '../dto/res/user-paginate.dto';
 

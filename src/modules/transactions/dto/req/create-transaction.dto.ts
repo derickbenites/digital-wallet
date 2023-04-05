@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { TypeTransaction } from '../../../../common/constants/type-transaction.constant';
 
 export class CreateTransactionDto {
   @IsNotEmpty()

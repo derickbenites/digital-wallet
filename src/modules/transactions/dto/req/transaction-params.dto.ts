@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { TypeTransaction } from '../../../../common/constants/type-transaction.constant';
 
 export class TrasactionParamsDto {
   @ApiProperty({ required: false })

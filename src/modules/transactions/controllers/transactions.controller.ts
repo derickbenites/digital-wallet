@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { TransactionsService } from '../services/transactions.service';
-import { CreateTransactionDto, ReqCreateTransactionDto } from '../dto/req/create-transaction.dto';
+import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { TransactionDto } from '../dto/res/transaction.dto';
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 
 @Controller('transactions')
 @ApiTags('Transactions')
