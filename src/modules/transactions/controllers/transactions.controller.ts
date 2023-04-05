@@ -45,9 +45,4 @@ export class TransactionsController {
   ) {
     return this.transactionsService.findAll(userId, params, pageOptionsDto);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionsService.findOne(+id);
-  }
 }
