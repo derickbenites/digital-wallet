@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { WalletEntity } from '../entities/wallet.entity';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 
 @Injectable()

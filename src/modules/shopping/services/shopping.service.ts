@@ -3,10 +3,10 @@ import { CreateShoppingDto } from '../dto/req/create-shopping.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ShoppingRepository } from '../repositories/shopping.repository';
 import { ShoppingDto } from '../dto/res/shopping.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { WalletsService } from 'src/modules/wallets/services/wallets.service';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
-import { TransactionsService } from 'src/modules/transactions/services/transactions.service';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
+import { WalletsService } from '../../../modules/wallets/services/wallets.service';
+import { TypeTransaction } from '../../../common/constants/type-transaction.constant';
+import { TransactionsService } from '../../../modules/transactions/services/transactions.service';
 
 @Injectable()
 export class ShoppingService {

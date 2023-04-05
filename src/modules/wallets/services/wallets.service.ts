@@ -3,9 +3,9 @@ import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WalletsRepository } from '../repositories/wallet.repository';
 import { WalletDto } from '../dto/res/wallet.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { CreateTransactionDto } from 'src/modules/transactions/dto/req/create-transaction.dto';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
+import { CreateTransactionDto } from '../../../modules/transactions/dto/req/create-transaction.dto';
+import { TypeTransaction } from '../../../common/constants/type-transaction.constant';
 import { EntityManager } from 'typeorm';
 
 @Injectable()

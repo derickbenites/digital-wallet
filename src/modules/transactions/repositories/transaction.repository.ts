@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
 import { TransactionEntity } from '../entities/transaction.entity';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { TypeTransaction } from '../../../common/constants/type-transaction.constant';
 
 @Injectable()
 export class TransactionRepository extends Repository<TransactionEntity> {

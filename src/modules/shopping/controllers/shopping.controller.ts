@@ -19,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { ShoppingDto } from '../dto/res/shopping.dto';
 import { ShoppingPaginateDto } from '../dto/res/shopping-paginate.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 
 @Controller('shopping')
 @ApiTags('Shopping')

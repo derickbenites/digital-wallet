@@ -1,13 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreateTransactionDto, ReqCreateTransactionDto } from '../dto/req/create-transaction.dto';
+import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRepository } from '../repositories/transaction.repository';
 import { TransactionDto } from '../dto/res/transaction.dto';
-import { WalletsService } from 'src/modules/wallets/services/wallets.service';
-import { UsersService } from 'src/modules/users/services/users.service';
-import { TypeTransaction } from 'src/common/constants/type-transaction.constant';
+import { WalletsService } from '../../../modules/wallets/services/wallets.service';
+import { UsersService } from '../../../modules/users/services/users.service';
+import { TypeTransaction } from '../../../common/constants/type-transaction.constant';
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { EntityManager } from 'typeorm';
 
 @Injectable()
