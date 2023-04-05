@@ -21,7 +21,17 @@ describe('TransactionsService', () => {
       updateBalance: jest.fn(),
     });
     userService = mock<UsersService>({});
-    transactionRepository = mock<TransactionRepository>({});
+    transactionRepository = mock<TransactionRepository>({
+      createTransaction: jest.fn(),
+      findAllTransaction: jest.fn(),
+      getWalletExtract: jest.fn(),
+    });
+
+    service = new TransactionsService(
+      transactionRepository,
+      userService,
+      walletService,
+    );
   });
 
   it('should be defined', () => {
@@ -43,20 +53,15 @@ describe('TransactionsService', () => {
         action: 2,
       },
     ];
-    const entityManagerMock = {
+    const entityManager = {
       transaction: jest.fn().mockImplementation((callback) => callback()),
     };
-    const valideTransactionSpy = jest.spyOn(service, 'valideTransaction');
-
-    const updateBalanceSpy = jest.spyOn(walletService, 'updateBalance');
-    const saveTransactionSpy = jest.spyOn(service, 'saveTransaction');
-
     await service.create(createTransactionDto);
 
     expect(service.valideTransaction).toHaveBeenCalledTimes(2);
     expect(walletService.updateBalance).toHaveBeenCalledTimes(2);
     expect(service.saveTransaction).toHaveBeenCalledTimes(2);
-    expect(entityManagerMock.transaction).toHaveBeenCalledTimes(1);
+    expect(entityManager.transaction).toHaveBeenCalledTimes(1);
   });
 
   test('saveTransaction method should return a transaction', async () => {
@@ -66,14 +71,12 @@ describe('TransactionsService', () => {
       valueTransaction: 100,
       action: 1,
     };
-    const entityManagerMock = {
+    const entityManager = {
       transaction: jest.fn().mockImplementation((callback) => callback()),
     };
 
     const entity = mock<TransactionRepository>({});
-    const transactionRepositoryMock = {
-      createTransaction: jest.fn().mockReturnValue(transactionDto),
-    };
+
     service.saveTransaction = await jest.fn().mockResolvedValueOnce({
       userId: 'user1',
       walletId: 'wallet1',
@@ -87,10 +90,10 @@ describe('TransactionsService', () => {
     );
 
     expect(result).toEqual(transactionDto);
-    // expect(transactionRepositoryMock.createTransaction).toHaveBeenCalledWith(
-    //   transactionDto,
-    //   entityManagerMock,
-    // );
+    expect(transactionRepository).toHaveBeenCalledWith(
+      transactionDto,
+      entityManager,
+    );
   });
 
   test('valideTransaction method should call valideUser and valideWallet methods', async () => {
