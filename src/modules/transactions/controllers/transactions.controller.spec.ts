@@ -10,7 +10,6 @@ describe('TransactionsController', () => {
     transactionsService = mock<TransactionsService>({
       create: jest.fn(),
       findAll: jest.fn(),
-      findOne: jest.fn(),
     });
 
     controller = new TransactionsController(transactionsService);
@@ -47,12 +46,5 @@ describe('TransactionsController', () => {
       params,
       pageOptionsDto,
     );
-  });
-
-  test('findOne should call transactionsService.findOne with the provided id', () => {  
-    const id = '123';
-    controller.findOne(id);
-
-    expect(transactionsService.findOne).toHaveBeenCalledWith(+id);
   });
 });

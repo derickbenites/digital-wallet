@@ -22,7 +22,7 @@ export class TransactionRepository extends Repository<TransactionEntity> {
 
   async createTransaction(
     createTransactionDto: CreateTransactionDto,
-    entityManager: EntityManager
+    entityManager: EntityManager,
   ): Promise<TransactionEntity> {
     const transactionEntity = {
       ...createTransactionDto,
