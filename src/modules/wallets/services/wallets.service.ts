@@ -102,7 +102,7 @@ export class WalletsService {
   }
 
   async valideWallet(walletId: string) {
-    const wallet = this.walletsRepository.findOneOrFail({
+    const wallet = await this.walletsRepository.findOneOrFail({
       where: { id: walletId },
     });
     if (!wallet) {

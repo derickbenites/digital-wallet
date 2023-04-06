@@ -40,8 +40,6 @@ export class WalletsRepository extends Repository<WalletEntity> {
   }
 
   async updateWallet(wallet: WalletEntity, entityManager: EntityManager) {
-    const queryBuilder = entityManager.createQueryBuilder();
-
-    return await queryBuilder.update(WalletEntity, wallet);
+    return await entityManager.update(WalletEntity, { id: wallet.id }, wallet);
   }
 }

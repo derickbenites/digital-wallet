@@ -33,14 +33,7 @@ export class TransactionRepository extends Repository<TransactionEntity> {
       TransactionEntity,
       transactionEntity,
     );
-
-    try {
-      return await entityManager.save(TransactionEntity, transaction);
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Error saving transaction to database',
-      );
-    }
+    return await entityManager.save(TransactionEntity, transaction);
   }
 
   async getWalletExtract(

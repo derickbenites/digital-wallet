@@ -9,6 +9,7 @@ import { TypeTransaction } from '../../../common/constants/type-transaction.cons
 import { TrasactionParamsDto } from '../dto/req/transaction-params.dto';
 import { PageOptionsDto } from '../../../common/dtos/page-options.dto';
 import { EntityManager } from 'typeorm';
+import { TransactionEntity } from '../entities/transaction.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -21,13 +22,15 @@ export class TransactionsService {
 
   async create(createTransactionDto: Array<CreateTransactionDto>) {
     try {
-      await this.transactionRepository.manager.transaction(
+      return await this.transactionRepository.manager.transaction(
         async (entityManager) => {
-          createTransactionDto.forEach((transaction) => {
+          const result: Array<TransactionEntity> = [];
+          for (const transaction of createTransactionDto) {
             this.valideTransaction(transaction);
             this.walletService.updateBalance(transaction, entityManager);
-            this.saveTransaction(transaction, entityManager);
-          });
+            result.push(await this.saveTransaction(transaction, entityManager));
+          }
+          return result;
         },
       );
     } catch (error) {
@@ -63,8 +66,8 @@ export class TransactionsService {
   }
 
   async valideTransaction(dto: CreateTransactionDto) {
-    this.usersService.valideUser(dto.userId);
-    this.walletService.valideWallet(dto.walletId);
+    await this.usersService.valideUser(dto.userId);
+    await this.walletService.valideWallet(dto.walletId);
   }
 
   async findAll(
@@ -72,7 +75,7 @@ export class TransactionsService {
     params: TrasactionParamsDto,
     pageOptionsDto: PageOptionsDto,
   ) {
-    this.usersService.valideUser(userId);
+    await this.usersService.valideUser(userId);
     const transaction = await this.transactionRepository.getWalletExtract(
       userId,
       params.type,
