@@ -25,7 +25,7 @@ export class ShoppingService {
 
       this.validateShopping(wallet.balance, price);
 
-      await this.shoppingRepository.manager.transaction(
+      const result = await this.shoppingRepository.manager.transaction(
         async (entityManager) => {
           const shopping = await this.shoppingRepository.createShopping(
             createShoppingDto,
@@ -39,12 +39,15 @@ export class ShoppingService {
             action: TypeTransaction.PAYMENT,
           };
 
-          this.walletService.updateBalance(transaction, entityManager);
-          this.transactionService.saveTransaction(transaction, entityManager);
-
+          await this.walletService.updateBalance(transaction, entityManager);
+          await this.transactionService.saveTransaction(
+            transaction,
+            entityManager,
+          );
           return new ShoppingDto(shopping);
         },
       );
+      return result;
     } catch (error) {
       console.error(
         JSON.stringify({ context: this.create.name, message: error }),
