@@ -56,40 +56,39 @@ describe('ShoppingService', () => {
       price: 50,
     };
 
-    // shoppingRepository.createShopping = jest
-    //   .fn()
-    //   .mockResolvedValueOnce({ id: '1', ...createShoppingDto });
+    shoppingRepository.createShopping = jest
+      .fn()
+      .mockResolvedValueOnce({ id: '1', ...createShoppingDto });
 
     const result = await shoppingService.create(createShoppingDto);
 
-    
     expect(shoppingRepository.manager.transaction).toHaveBeenCalled();
-    // expect(shoppingRepository.createShopping).toHaveBeenCalledWith(
-    //   createShoppingDto,
-    //   undefined,
-    // );
-    // expect(walletService.findOne).toHaveBeenCalledWith(
-    //   createShoppingDto.walletId,
-    //   createShoppingDto.userId,
-    // );
-    // expect(walletService.updateBalance).toHaveBeenCalledWith(
-    //   {
-    //     userId: createShoppingDto.userId,
-    //     walletId: createShoppingDto.walletId,
-    //     valueTransaction: createShoppingDto.price,
-    //     action: 3,
-    //   },
-    //   expect.any(Object),
-    // );
-    // expect(transactionService.saveTransaction).toHaveBeenCalledWith(
-    //   {
-    //     userId: createShoppingDto.userId,
-    //     walletId: createShoppingDto.walletId,
-    //     valueTransaction: createShoppingDto.price,
-    //     action: 3,
-    //   },
-    //   expect.any(Object),
-    // );
+    expect(shoppingRepository.createShopping).toHaveBeenCalledWith(
+      createShoppingDto,
+      undefined,
+    );
+    expect(walletService.findOne).toHaveBeenCalledWith(
+      createShoppingDto.walletId,
+      createShoppingDto.userId,
+    );
+    expect(walletService.updateBalance).toHaveBeenCalledWith(
+      {
+        userId: createShoppingDto.userId,
+        walletId: createShoppingDto.walletId,
+        valueTransaction: createShoppingDto.price,
+        action: 3,
+      },
+      expect.any(Object),
+    );
+    expect(transactionService.saveTransaction).toHaveBeenCalledWith(
+      {
+        userId: createShoppingDto.userId,
+        walletId: createShoppingDto.walletId,
+        valueTransaction: createShoppingDto.price,
+        action: 3,
+      },
+      expect.any(Object),
+    );
     expect(result).toEqual({ id: '1', ...createShoppingDto });
   });
 
