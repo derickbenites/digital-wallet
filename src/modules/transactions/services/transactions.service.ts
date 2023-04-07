@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from '../dto/req/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRepository } from '../repositories/transaction.repository';
@@ -27,7 +27,7 @@ export class TransactionsService {
           const result: Array<TransactionEntity> = [];
           for (const transaction of createTransactionDto) {
             this.valideTransaction(transaction);
-            this.walletService.updateBalance(transaction, entityManager);
+            await this.walletService.updateBalance(transaction, entityManager);
             result.push(await this.saveTransaction(transaction, entityManager));
           }
           return result;
@@ -68,6 +68,40 @@ export class TransactionsService {
   async valideTransaction(dto: CreateTransactionDto) {
     await this.usersService.valideUser(dto.userId);
     await this.walletService.valideWallet(dto.walletId);
+    await this.valideDuplicade(dto);
+  }
+
+  async valideDuplicade(dto: CreateTransactionDto) {
+    const transactions = await this.transactionRepository.find({
+      where: {
+        userId: dto.userId,
+        walletId: dto.walletId,
+        valueTransaction: dto.valueTransaction,
+        action: dto.action,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (transactions.length > 0) {
+      const current = new Date().getTime();
+
+      const minTransactions = new Date(
+        Date.parse(transactions[0].createdAt + '+0000'),
+      ).getTime();
+
+      const verify = Math.floor((current - minTransactions) / 60000);
+
+      if (verify < 1) {
+        throw new HttpException(
+          {
+            message: 'Duplicate Transaction',
+            status: false,
+            status_code: 4000,
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
   }
 
   async findAll(
