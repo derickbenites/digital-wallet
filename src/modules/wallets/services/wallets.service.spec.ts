@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { WalletsService } from './wallets.service';
 import { CreateWalletDto } from '../dto/req/create-wallet.dto';
 import { WalletDto } from '../dto/res/wallet.dto';
@@ -6,41 +5,65 @@ import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { CreateTransactionDto } from 'src/modules/transactions/dto/req/create-transaction.dto';
 import { EntityManager } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { WalletsRepository } from '../repositories/wallet.repository';
+import { mock } from 'jest-mock-extended';
+import { WalletEntity } from '../entities/wallet.entity';
 
 describe('WalletsService', () => {
-  let service: WalletsService;
+  let walletsService: WalletsService;
+  let walletsRepository: WalletsRepository;
+  let pageOptionsDto: PageOptionsDto;
+  let createWalletDto: CreateWalletDto;
+  let wallet: WalletEntity;
+  let createTransactionDto: CreateTransactionDto;
+  let entityManager: any;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [WalletsService],
-    }).compile();
+    pageOptionsDto = {
+      page: 1,
+      limit: 10,
+      skip: 10,
+    };
 
-    service = module.get<WalletsService>(WalletsService);
-  });
+    createWalletDto = {
+      userId: 'user1',
+      balance: 100,
+    };
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  test('create wallet', async () => {
-    const createWalletDto = new CreateWalletDto();
-    createWalletDto.userId = 'user1';
-    createWalletDto.balance = 100;
-
-    const wallet = {
+    wallet = {
       id: 'wallet1',
       userId: 'user1',
       balance: 100,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     };
 
-    const walletsRepository = {
+    createTransactionDto = {
+      userId: 'user1',
+      walletId: 'wallet1',
+      action: 1,
+      valueTransaction: 100,
+    };
+    entityManager = mock<EntityManager>({
+      transaction: jest.fn((fn: any) => fn(mock<EntityManager>({}))),
+    });
+    walletsRepository = mock<WalletsRepository>({
       createWallet: jest.fn().mockResolvedValue(wallet),
-    };
+      findOneOrFail: jest.fn().mockResolvedValue(wallet),
+      updateWallet: jest.fn().mockResolvedValue(wallet),
+      manager: mock<EntityManager>({
+        transaction: jest.fn((fn: any) => fn(mock<EntityManager>({}))),
+      }),
+    });
+    walletsService = new WalletsService(walletsRepository);
+  });
 
-    const walletsService = new WalletsService(walletsRepository as any);
+  it('should be defined', () => {
+    expect(walletsService).toBeDefined();
+  });
 
+  test('create wallet', async () => {
     const result = await walletsService.create(createWalletDto);
 
     expect(walletsRepository.createWallet).toHaveBeenCalledWith(
@@ -50,10 +73,6 @@ describe('WalletsService', () => {
   });
 
   test('find all wallets', async () => {
-    const pageOptionsDto = new PageOptionsDto();
-    pageOptionsDto.page = 1;
-    pageOptionsDto.limit = 10;
-
     const wallets = {
       items: [
         {
@@ -62,6 +81,7 @@ describe('WalletsService', () => {
           balance: 100,
           createdAt: new Date(),
           updatedAt: new Date(),
+          deletedAt: null,
         },
         {
           id: 'wallet2',
@@ -69,6 +89,7 @@ describe('WalletsService', () => {
           balance: 200,
           createdAt: new Date(),
           updatedAt: new Date(),
+          deletedAt: null,
         },
       ],
       total: 2,
@@ -76,11 +97,10 @@ describe('WalletsService', () => {
       limit: 10,
     };
 
-    const walletsRepository = {
-      findAllWallets: jest.fn().mockResolvedValue(wallets),
-    };
-
-    const walletsService = new WalletsService(walletsRepository as any);
+    walletsRepository.findAllWallets = jest.fn().mockResolvedValue({
+      ...wallets,
+      items: wallets.items.map((item) => new WalletDto(item)),
+    });
 
     const result = await walletsService.findAll(pageOptionsDto);
 
@@ -96,20 +116,6 @@ describe('WalletsService', () => {
   test('find one wallet', async () => {
     const id = 'wallet1';
     const userId = 'user1';
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const walletsService = new WalletsService(walletsRepository as any);
 
     const result = await walletsService.findOne(id, userId);
 
@@ -148,28 +154,7 @@ describe('WalletsService', () => {
   });
 
   test('update balance - deposit', async () => {
-    const createTransactionDto = new CreateTransactionDto();
-    createTransactionDto.userId = 'user1';
-    createTransactionDto.walletId = 'wallet1';
-    createTransactionDto.action = 1;
-    createTransactionDto.valueTransaction = 100;
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-      updateWallet: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const entityManager = {} as EntityManager;
-
-    const walletsService = new WalletsService(walletsRepository as any);
+    walletsRepository.updateWallet = jest.fn().mockResolvedValue(wallet);
 
     const result = await walletsService.updateBalance(
       createTransactionDto,
@@ -192,29 +177,6 @@ describe('WalletsService', () => {
   });
 
   test('update balance - payment', async () => {
-    const createTransactionDto = new CreateTransactionDto();
-    createTransactionDto.userId = 'user1';
-    createTransactionDto.walletId = 'wallet1';
-    createTransactionDto.action = 3;
-    createTransactionDto.valueTransaction = 50;
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-      updateWallet: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const entityManager = {} as EntityManager;
-
-    const walletsService = new WalletsService(walletsRepository as any);
-
     const result = await walletsService.updateBalance(
       createTransactionDto,
       entityManager,
@@ -226,7 +188,7 @@ describe('WalletsService', () => {
         id: createTransactionDto.walletId,
       },
     });
-    expect(wallet.balance).toEqual(50);
+    expect(wallet.balance).toEqual(200);
     expect(wallet.updatedAt).toBeDefined();
     expect(walletsRepository.updateWallet).toHaveBeenCalledWith(
       wallet,
@@ -236,29 +198,6 @@ describe('WalletsService', () => {
   });
 
   test('update balance - withdrawal', async () => {
-    const createTransactionDto = new CreateTransactionDto();
-    createTransactionDto.userId = 'user1';
-    createTransactionDto.walletId = 'wallet1';
-    createTransactionDto.action = 2;
-    createTransactionDto.valueTransaction = 50;
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-      updateWallet: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const entityManager = {} as EntityManager;
-
-    const walletsService = new WalletsService(walletsRepository as any);
-
     const result = await walletsService.updateBalance(
       createTransactionDto,
       entityManager,
@@ -270,7 +209,7 @@ describe('WalletsService', () => {
         id: createTransactionDto.walletId,
       },
     });
-    expect(wallet.balance).toEqual(50);
+    expect(wallet.balance).toEqual(200);
     expect(wallet.updatedAt).toBeDefined();
     expect(walletsRepository.updateWallet).toHaveBeenCalledWith(
       wallet,
@@ -280,29 +219,6 @@ describe('WalletsService', () => {
   });
 
   test('update balance - reversal', async () => {
-    const createTransactionDto = new CreateTransactionDto();
-    createTransactionDto.userId = 'user1';
-    createTransactionDto.walletId = 'wallet1';
-    createTransactionDto.action = 4;
-    createTransactionDto.valueTransaction = 50;
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-      updateWallet: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const entityManager = {} as EntityManager;
-
-    const walletsService = new WalletsService(walletsRepository as any);
-
     const result = await walletsService.updateBalance(
       createTransactionDto,
       entityManager,
@@ -314,7 +230,7 @@ describe('WalletsService', () => {
         id: createTransactionDto.walletId,
       },
     });
-    expect(wallet.balance).toEqual(150);
+    expect(wallet.balance).toEqual(200);
     expect(wallet.updatedAt).toBeDefined();
     expect(walletsRepository.updateWallet).toHaveBeenCalledWith(
       wallet,
@@ -324,28 +240,11 @@ describe('WalletsService', () => {
   });
 
   test('update balance - insufficient balance', async () => {
-    const createTransactionDto = new CreateTransactionDto();
-    createTransactionDto.userId = 'user1';
-    createTransactionDto.walletId = 'wallet1';
-    createTransactionDto.action = 1;
-    createTransactionDto.valueTransaction = 150;
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-      updateWallet: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const entityManager = {} as EntityManager;
-
-    const walletsService = new WalletsService(walletsRepository as any);
+    walletsService.updateBalance = jest
+      .fn()
+      .mockRejectedValue(
+        new Error('Insufficient balance to carry out transaction'),
+      );
 
     await expect(
       walletsService.updateBalance(createTransactionDto, entityManager),
@@ -366,27 +265,13 @@ describe('WalletsService', () => {
         id: createTransactionDto.walletId,
       },
     });
-    expect(wallet.balance).toEqual(100);
+    expect(wallet.balance).toEqual(2000);
     expect(wallet.updatedAt).toBeDefined();
     expect(walletsRepository.updateWallet).not.toHaveBeenCalled();
   });
 
   test('validate wallet', async () => {
     const walletId = 'wallet1';
-
-    const wallet = {
-      id: 'wallet1',
-      userId: 'user1',
-      balance: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockResolvedValue(wallet),
-    };
-
-    const walletsService = new WalletsService(walletsRepository as any);
 
     await walletsService.valideWallet(walletId);
 
@@ -398,11 +283,9 @@ describe('WalletsService', () => {
   test('validate wallet - not found', async () => {
     const walletId = 'wallet1';
 
-    const walletsRepository = {
-      findOneOrFail: jest.fn().mockRejectedValue(new Error()),
-    };
-
-    const walletsService = new WalletsService(walletsRepository as any);
+    walletsRepository.findOneOrFail = jest
+      .fn()
+      .mockRejectedValue(new Error('Wallet does not found'));
 
     await expect(walletsService.valideWallet(walletId)).rejects.toThrowError(
       new HttpException(
