@@ -12,12 +12,24 @@ services:
     environment:
       POSTGRES_USER: pguser
       POSTGRES_PASSWORD: pgpassword
+    networks:
+      - example-network
 
   adminer:
+    container_name: 'adminer'
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     image: adminer
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - example-network
 
 volumes:
   pg-data:
+
+networks:
+  example-network:
+    name: 'example-network'
